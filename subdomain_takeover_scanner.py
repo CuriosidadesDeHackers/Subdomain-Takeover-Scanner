@@ -116,7 +116,7 @@ class SubdomainScanner:
                 # Configurar PATH
                 with open(os.path.expanduser("~/.bashrc"), "a") as f:
                     f.write('\nexport PATH=$PATH:/usr/local/go/bin\n')
-                
+
                 print(Fore.GREEN + "Go instalado. Ejecuta 'source ~/.bashrc' o reinicia tu terminal.")
 
             return True
@@ -161,7 +161,7 @@ class SubdomainScanner:
         """Ejecuta subfinder para encontrar subdominios."""
         output_file = f"{domain}_subdomains.txt"
         tool_path = self.check_tool('subfinder')
-        
+
         if not self.run_command(
             [tool_path, "-d", domain, "-o", output_file, "-silent"],
             "Error al ejecutar subfinder"
@@ -178,13 +178,22 @@ class SubdomainScanner:
         """Ejecuta subzy para verificar subdominios."""
         tool_path = self.check_tool('subzy')
         return self.run_command(
-            [tool_path, "run", "--targets", input_file],
+            [tool_path, "run", "--targets", input_file, "--hide_fails"],
             "Error al ejecutar subzy"
         )
 
     def main(self):
         self.clear_screen()
-        print(Fore.CYAN + "=== Escáner de Subdominios ===")
+        print(Fore.CYAN + r"""
+ _____       _         _                       _         _____     _                              _____                                
+/  ___|     | |       | |                     (_)       |_   _|   | |                            /  ___|                                
+\ `--. _   _| |__   __| | ___  _ __ ___   __ _ _ _ __     | | __ _| | _____  _____   _____ _ __  \ `--.  ___ __ _ _ __  _ __   ___ _ __
+ `--. \ | | | '_ \ / _` |/ _ \| '_ ` _ \ / _` | | '_ \    | |/ _` | |/ / _ \/ _ \ \ / / _ \ '__|  `--. \/ __/ _` | '_ \| '_ \ / _ \ '__|
+/\__/ / |_| | |_) | (_| | (_) | | | | | | (_| | | | | |   | | (_| |   <  __/ (_) \ V /  __/ |    /\__/ / (_| (_| | | | | | | |  __/ |
+\____/ \__,_|_.__/ \__,_|\___/|_| |_| |_|\__,_|_|_| |_|   \_/\__,_|_|\_\___|\___/ \_/ \___|_|    \____/ \___\__,_|_| |_|_| |_|\___|_|
+
+""")
+        print(Fore.BLUE + "creado por CuriosidadesDeHackers\n")
 
         # Verificar Go
         go_path = self.get_go_path()
