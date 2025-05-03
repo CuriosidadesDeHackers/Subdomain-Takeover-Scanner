@@ -18,6 +18,7 @@ Subdomain Takeover Scanner es una herramienta de línea de comandos escrita en P
 - **Compatibilidad Multiplataforma:** Soporta sistemas operativos Windows y Linux.
 - **Interfaz de Usuario Amigable:** Proporciona una interfaz de línea de comandos sencilla y guiada.
 - **Opciones Avanzadas:** Permite al usuario decidir si desea extraer subdominios del dominio principal o directamente extraer URLs del dominio principal.
+- **Limpieza de URLs:** Si el usuario no desea escanear subdominios, la herramienta elimina todo lo que hay entre `://` y el punto antes del dominio dado en el archivo de URLs.
 
 ## 🛠️ Requisitos
 
@@ -58,13 +59,13 @@ Subdomain Takeover Scanner es una herramienta de línea de comandos escrita en P
 
 ## 📸 Demo
 
-Busqueda de Subdominios y Urls junto con prueba de posible subdomain takeover.
+Búsqueda de Subdominios y URLs junto con prueba de posible subdomain takeover.
 ![image](https://github.com/user-attachments/assets/39f3a4c6-0483-4126-a2f1-ad37e33cec3e)
 
-Busqueda de solo Urls junto con prueba de posible subdomain takeover.
+Búsqueda de solo URLs junto con prueba de posible subdomain takeover.
 ![image](https://github.com/user-attachments/assets/2dd487b3-c685-42f8-bca8-976607502682)
 
-Busqueda de solo Subdominios junto con prueba de posible subdomain takeover.
+Búsqueda de solo Subdominios junto con prueba de posible subdomain takeover.
 ![image](https://github.com/user-attachments/assets/2468d307-008f-45a5-8a2b-669fc58160cf)
 
 ## 🤝 Contribuciones
@@ -82,8 +83,3 @@ Este proyecto está bajo la Licencia GNU GPL v3.0. Consulta el archivo `LICENSE`
 ---
 
 **Nota:** Esta herramienta es compatible tanto para Windows como para Linux.
-
-
-### Cambios realizados:
-1. **Añadida la característica de extracción de URLs**: Se menciona que la herramienta utiliza `waybackurls` para extraer URLs de los subdominios encontrados.
-2. **Añadida la opción avanzada**: Se menciona que la herramienta permite al usuario decidir si desea extraer subdominios del dominio principal o directamente extraer URLs del dominio principal.
