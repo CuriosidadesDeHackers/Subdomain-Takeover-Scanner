@@ -37,6 +37,10 @@ class SubdomainScanner:
             'subzy': {
                 'install': 'go install -v github.com/PentestPad/subzy@latest',
                 'test_cmd': ['version']
+            },
+            'waybackurls': {
+                'install': 'go install github.com/tomnomnom/waybackurls@latest',
+                'test_cmd': ['-version']
             }
         }
 
@@ -54,7 +58,7 @@ class SubdomainScanner:
                 stderr=subprocess.PIPE,
                 text=True
             )
-            return True
+            return result.stdout if result.stdout else True
         except subprocess.CalledProcessError as e:
             if error_msg:
                 print(Fore.RED + f"{error_msg}: {e.stderr if e.stderr else str(e)}")
@@ -174,6 +178,44 @@ class SubdomainScanner:
 
         return output_file
 
+    def run_waybackurls(self, subdomain):
+        """Ejecuta waybackurls para extraer URLs de un subdominio."""
+        tool_path = self.check_tool('waybackurls')
+        output = self.run_command([tool_path, subdomain], show_output=False)
+        return output.splitlines() if output else []
+
+    def process_subdomains(self, subdomains_file):
+        """Procesa cada subdominio con waybackurls y combina los resultados."""
+        urls_file = subdomains_file.replace("_subdomains.txt", "_urls.txt")
+        with open(subdomains_file, 'r') as file:
+            subdomains = file.readlines()
+
+        all_urls = []
+        for subdomain in subdomains:
+            subdomain = subdomain.strip()
+            print(Fore.BLUE + f"[+] Extrayendo URLs para {subdomain}...")
+            urls = self.run_waybackurls(subdomain)
+            all_urls.extend(urls)
+
+        # Añadir subdominios limpios al archivo de URLs
+        all_urls.extend(subdomains)
+
+        with open(urls_file, 'w') as file:
+            file.writelines("\n".join(all_urls) + "\n")
+
+        return urls_file
+
+    def run_waybackurls_for_domain(self, domain):
+        """Ejecuta waybackurls para extraer URLs del dominio principal."""
+        tool_path = self.check_tool('waybackurls')
+        output_file = f"{domain}_urls.txt"
+        output = self.run_command([tool_path, domain], show_output=False)
+        if output:
+            with open(output_file, 'w') as file:
+                file.write(output)
+            return output_file
+        return None
+
     def run_subzy(self, input_file):
         """Ejecuta subzy para verificar subdominios."""
         tool_path = self.check_tool('subzy')
@@ -227,14 +269,28 @@ class SubdomainScanner:
             print(Fore.RED + "Dominio no válido")
             sys.exit(1)
 
-        # Escanear
-        print(Fore.BLUE + "\n[+] Buscando subdominios...")
-        result_file = self.run_subfinder(domain)
-        if not result_file:
-            sys.exit(1)
+        # Preguntar si se desea extraer subdominios
+        if input(Fore.YELLOW + "\n¿Deseas extraer los subdominios del dominio principal? (s/n): ").lower() == 's':
+            print(Fore.BLUE + "\n[+] Buscando subdominios...")
+            subdomains_file = self.run_subfinder(domain)
+            if not subdomains_file:
+                sys.exit(1)
 
+            # Preguntar si se desea extraer URLs
+            if input(Fore.YELLOW + "\n¿Deseas extraer todas las URLs de los subdominios encontrados? (s/n): ").lower() == 's':
+                urls_file = self.process_subdomains(subdomains_file)
+            else:
+                urls_file = subdomains_file
+        else:
+            # Extraer URLs del dominio principal
+            print(Fore.BLUE + "\n[+] Extrayendo URLs del dominio principal...")
+            urls_file = self.run_waybackurls_for_domain(domain)
+            if not urls_file:
+                sys.exit(1)
+
+        # Verificar subdominios con subzy
         print(Fore.BLUE + "\n[+] Verificando subdominios...")
-        if not self.run_subzy(result_file):
+        if not self.run_subzy(urls_file):
             sys.exit(1)
 
         print(Fore.GREEN + "\n[+] Escaneo completado con éxito")
