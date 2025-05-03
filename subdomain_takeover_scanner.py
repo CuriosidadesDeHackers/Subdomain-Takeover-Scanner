@@ -188,21 +188,25 @@ class SubdomainScanner:
         """Procesa cada subdominio con waybackurls y combina los resultados."""
         urls_file = subdomains_file.replace("_subdomains.txt", "_urls.txt")
         with open(subdomains_file, 'r') as file:
-            subdomains = file.readlines()
+            subdomains = [s.strip() for s in file.readlines() if s.strip()]
 
         all_urls = []
+        processed = set()  # Para evitar procesar duplicados
+        
         for subdomain in subdomains:
-            subdomain = subdomain.strip()
+            if subdomain in processed:
+                continue
+            processed.add(subdomain)
+            
             print(Fore.BLUE + f"[+] Extrayendo URLs para {subdomain}...")
             urls = self.run_waybackurls(subdomain)
-            all_urls.extend(urls)
+            if urls:
+                all_urls.extend(urls)
 
-        # Añadir subdominios limpios al archivo de URLs
-        all_urls.extend(subdomains)
-
+        # Escribir resultados (solo URLs únicas)
         with open(urls_file, 'w') as file:
-            file.writelines("\n".join(all_urls) + "\n")
-
+            file.write("\n".join(set(all_urls)) + "\n")  # Eliminar duplicados
+        
         return urls_file
 
     def run_waybackurls_for_domain(self, domain):
