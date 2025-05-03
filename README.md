@@ -58,9 +58,14 @@ Subdomain Takeover Scanner es una herramienta de línea de comandos escrita en P
 
 ## 📸 Demo
 
-![image](https://github.com/user-attachments/assets/23b3348f-8cd5-46b9-9314-a9bea6539031)
-![image](https://github.com/user-attachments/assets/b5e362f3-7f26-4592-a667-a955bc3b9c1b)
-![image](https://github.com/user-attachments/assets/4decb5c9-8d5e-4e55-b42a-a83042ceb1f4)
+Busqueda de Subdominios y Urls junto con prueba de posible subdomain takeover.
+![image](https://github.com/user-attachments/assets/39f3a4c6-0483-4126-a2f1-ad37e33cec3e)
+
+Busqueda de solo Urls junto con prueba de posible subdomain takeover.
+![image](https://github.com/user-attachments/assets/2dd487b3-c685-42f8-bca8-976607502682)
+
+Busqueda de solo Subdominios junto con prueba de posible subdomain takeover.
+![image](https://github.com/user-attachments/assets/2468d307-008f-45a5-8a2b-669fc58160cf)
 
 ## 🤝 Contribuciones
 
