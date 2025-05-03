@@ -54,15 +54,15 @@ class SubdomainScanner:
             result = subprocess.run(
                 command,
                 check=True,
-                stdout=subprocess.PIPE if not show_output else None,
+                stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True
             )
-            return result.stdout if result.stdout else True
+            return result.stdout.strip() if result.stdout else ""
         except subprocess.CalledProcessError as e:
             if error_msg:
                 print(Fore.RED + f"{error_msg}: {e.stderr if e.stderr else str(e)}")
-            return False
+            return None
 
     def get_go_path(self):
         """Obtiene la ruta de instalación de Go."""
@@ -166,21 +166,51 @@ class SubdomainScanner:
         output_file = f"{domain}_subdomains.txt"
         tool_path = self.check_tool('subfinder')
 
-        if not self.run_command(
-            [tool_path, "-d", domain, "-o", output_file, "-silent"],
-            "Error al ejecutar subfinder"
-        ):
-            return None
+        print(Fore.CYAN + "\n[+] Subdominios encontrados:\n" + Fore.RESET)
 
-        if not os.path.exists(output_file):
-            print(Fore.RED + "No se generó el archivo de resultados")
-            return None
+        # Ejecutar subfinder y mostrar resultados en tiempo real
+        try:
+            process = subprocess.Popen(
+                [tool_path, "-d", domain],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True
+            )
 
-        return output_file
+            subdomains = set()
+            for line in process.stdout:
+                subdomain = line.strip()
+                if subdomain:  # Solo si no está vacío
+                    print(subdomain)
+                    subdomains.add(subdomain)
+
+            # Esperar a que termine el proceso
+            process.wait()
+
+            if process.returncode != 0:
+                error = process.stderr.read()
+                print(Fore.RED + f"Error al ejecutar subfinder: {error}")
+                return None
+
+            # Guardar resultados en archivo
+            with open(output_file, 'w') as f:
+                f.write('\n'.join(sorted(subdomains)))
+
+            print(Fore.GREEN + f"\n[+] Total de subdominios encontrados: {len(subdomains)}")
+            print(Fore.GREEN + f"[+] Resultados guardados en: {output_file}")
+
+            return output_file
+
+        except Exception as e:
+            print(Fore.RED + f"Error al ejecutar subfinder: {str(e)}")
+            return None
 
     def run_waybackurls(self, subdomain):
         """Ejecuta waybackurls para extraer URLs de un subdominio."""
         tool_path = self.check_tool('waybackurls')
+        if not tool_path:
+            return []
+
         output = self.run_command([tool_path, subdomain], show_output=False)
         return output.splitlines() if output else []
 
@@ -191,22 +221,25 @@ class SubdomainScanner:
             subdomains = [s.strip() for s in file.readlines() if s.strip()]
 
         all_urls = []
-        processed = set()  # Para evitar procesar duplicados
-        
-        for subdomain in subdomains:
-            if subdomain in processed:
-                continue
-            processed.add(subdomain)
-            
-            print(Fore.BLUE + f"[+] Extrayendo URLs para {subdomain}...")
+        total = len(subdomains)
+
+        print(Fore.CYAN + f"\n[+] Procesando {total} subdominios...\n")
+
+        for i, subdomain in enumerate(subdomains, 1):
+            print(Fore.BLUE + f"[{i}/{total}] Extrayendo URLs para {subdomain}...")
             urls = self.run_waybackurls(subdomain)
             if urls:
                 all_urls.extend(urls)
+                print(Fore.GREEN + f"  → Encontradas {len(urls)} URLs")
 
         # Escribir resultados (solo URLs únicas)
+        unique_urls = set(all_urls)
         with open(urls_file, 'w') as file:
-            file.write("\n".join(set(all_urls)) + "\n")  # Eliminar duplicados
-        
+            file.write("\n".join(unique_urls) + "\n")
+
+        print(Fore.GREEN + f"\n[+] Total de URLs únicas encontradas: {len(unique_urls)}")
+        print(Fore.GREEN + f"[+] Resultados guardados en: {urls_file}")
+
         return urls_file
 
     def run_waybackurls_for_domain(self, domain):
@@ -220,13 +253,56 @@ class SubdomainScanner:
             return output_file
         return None
 
+    def clean_urls_file(self, urls_file, domain):
+        """Elimina todo lo que hay entre :// y el punto antes del dominio dado en el archivo de URLs."""
+        cleaned_urls = []
+        with open(urls_file, 'r') as file:
+            for line in file:
+                url = line.strip()
+                if domain in url:
+                    prefix, suffix = url.split(f"://", 1)
+                    domain_index = suffix.find(f".{domain}")
+                    if domain_index != -1:
+                        cleaned_url = f"{prefix}://{suffix[domain_index+1:]}"
+                        cleaned_urls.append(cleaned_url)
+                    else:
+                        cleaned_urls.append(url)
+                else:
+                    cleaned_urls.append(url)
+
+        with open(urls_file, 'w') as file:
+            file.write("\n".join(cleaned_urls) + "\n")
+
+        print(Fore.GREEN + f"\n[+] Archivo de URLs limpiado: {urls_file}")
+
     def run_subzy(self, input_file):
         """Ejecuta subzy para verificar subdominios."""
         tool_path = self.check_tool('subzy')
-        return self.run_command(
-            [tool_path, "run", "--targets", input_file, "--hide_fails"],
-            "Error al ejecutar subzy"
-        )
+
+        try:
+            process = subprocess.Popen(
+                [tool_path, "run", "--targets", input_file, "--hide_fails"],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True
+            )
+
+            for line in process.stdout:
+                print(line, end='')  # Imprimir la salida en tiempo real
+
+            # Esperar a que termine el proceso
+            process.wait()
+
+            if process.returncode != 0:
+                error = process.stderr.read()
+                print(Fore.RED + f"Error al ejecutar subzy: {error}")
+                return None
+
+            return True
+
+        except Exception as e:
+            print(Fore.RED + f"Error al ejecutar subzy: {str(e)}")
+            return None
 
     def main(self):
         self.clear_screen()
@@ -280,6 +356,10 @@ class SubdomainScanner:
             if not subdomains_file:
                 sys.exit(1)
 
+            # Mostrar contenido del archivo de subdominios
+            with open(subdomains_file, 'r') as f:
+                subdomains = f.read().splitlines()
+
             # Preguntar si se desea extraer URLs
             if input(Fore.YELLOW + "\n¿Deseas extraer todas las URLs de los subdominios encontrados? (s/n): ").lower() == 's':
                 urls_file = self.process_subdomains(subdomains_file)
@@ -292,8 +372,11 @@ class SubdomainScanner:
             if not urls_file:
                 sys.exit(1)
 
+            # Limpiar el archivo de URLs
+            self.clean_urls_file(urls_file, domain)
+
         # Verificar subdominios con subzy
-        print(Fore.BLUE + "\n[+] Verificando subdominios...")
+        print(Fore.BLUE + "\n[+] Verificando subdominios en busca de subdomain takeover")
         if not self.run_subzy(urls_file):
             sys.exit(1)
 
