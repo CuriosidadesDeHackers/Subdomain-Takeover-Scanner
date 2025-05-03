@@ -1,3 +1,4 @@
+
 <a href='https://ko-fi.com/O4O3W3IIA' target='_blank'>
   <img height='36' style='border:0px;height:36px;' src='https://storage.ko-fi.com/cdn/kofi5.png?v=6' border='0' alt='Buy Me a Coffee at ko-fi.com' />
 </a>
@@ -12,9 +13,11 @@ Subdomain Takeover Scanner es una herramienta de línea de comandos escrita en P
 
 - **Detección de Subdominios:** Utiliza `subfinder` para encontrar subdominios de un dominio dado.
 - **Verificación de Subdominios:** Utiliza `subzy` para verificar la disponibilidad de los subdominios encontrados y detectar posibles vulnerabilidades de subdomain takeover.
+- **Extracción de URLs:** Utiliza `waybackurls` para extraer URLs de los subdominios encontrados.
 - **Instalación Automática de Dependencias:** Instala automáticamente Go y las herramientas necesarias si no están presentes en el sistema.
 - **Compatibilidad Multiplataforma:** Soporta sistemas operativos Windows y Linux.
 - **Interfaz de Usuario Amigable:** Proporciona una interfaz de línea de comandos sencilla y guiada.
+- **Opciones Avanzadas:** Permite al usuario decidir si desea extraer subdominios del dominio principal o directamente extraer URLs del dominio principal.
 
 ## 🛠️ Requisitos
 
@@ -45,6 +48,7 @@ Subdomain Takeover Scanner es una herramienta de línea de comandos escrita en P
 2. Sigue las instrucciones en pantalla para instalar Go y las herramientas necesarias si no están presentes.
 3. Introduce el dominio que deseas escanear cuando se te solicite.
 4. La herramienta buscará y verificará los subdominios automáticamente, identificando posibles vulnerabilidades de subdomain takeover.
+5. La herramienta preguntará si deseas extraer subdominios del dominio principal o directamente extraer URLs del dominio principal.
 
 ## 🎯 Público Objetivo
 
@@ -54,7 +58,11 @@ Subdomain Takeover Scanner es una herramienta de línea de comandos escrita en P
 
 ## 📸 Demo
 
-![image](https://github.com/user-attachments/assets/4e4e45ad-efaa-47b8-b4c1-8cb6efaa7244)
+![image](https://github.com/user-attachments/assets/b5e362f3-7f26-4592-a667-a955bc3b9c1b)
+![image](https://github.com/user-attachments/assets/4decb5c9-8d5e-4e55-b42a-a83042ceb1f4)
+![image](https://github.com/user-attachments/assets/d4ca6f74-059b-4e3a-a083-7228a8eac34f)
+
+
 
 ## 🤝 Contribuciones
 
@@ -71,3 +79,8 @@ Este proyecto está bajo la Licencia GNU GPL v3.0. Consulta el archivo `LICENSE`
 ---
 
 **Nota:** Esta herramienta es compatible tanto para Windows como para Linux.
+
+
+### Cambios realizados:
+1. **Añadida la característica de extracción de URLs**: Se menciona que la herramienta utiliza `waybackurls` para extraer URLs de los subdominios encontrados.
+2. **Añadida la opción avanzada**: Se menciona que la herramienta permite al usuario decidir si desea extraer subdominios del dominio principal o directamente extraer URLs del dominio principal.
