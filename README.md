@@ -52,6 +52,10 @@ Subdomain Takeover Scanner es una herramienta de línea de comandos escrita en P
 - **Administradores de Sistemas:** Para gestionar y asegurar los subdominios de sus dominios.
 - **Investigadores de Seguridad:** Para realizar análisis de seguridad en dominios específicos.
 
+## 📸 Demo
+
+![image](https://github.com/user-attachments/assets/4e4e45ad-efaa-47b8-b4c1-8cb6efaa7244)
+
 ## 🤝 Contribuciones
 
 Las contribuciones son bienvenidas. Por favor, abre un issue o envía un pull request para mejoras o correcciones.
